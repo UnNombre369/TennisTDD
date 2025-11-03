@@ -11,6 +11,9 @@ jobs:
   build:
     name: Build, test and SonarQube analysis
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: TennisND
 
     steps:
       - uses: actions/checkout@v4
@@ -46,8 +49,8 @@ jobs:
         with:
           name: reports
           path: |
-            target/site/jacoco
-            target/surefire-reports
+            TennisND/target/site/jacoco
+            TennisND/target/surefire-reports
 
       - name: SonarQube analysis
         env:
@@ -64,5 +67,5 @@ jobs:
       - name: "Optional: show artifact list"
         run: |
           echo "Uploaded reports (if any):"
-          ls -la target/site || true
-          ls -la target/surefire-reports || true
+          ls -la TennisND/target/site || true
+          ls -la TennisND/target/surefire-reports || true
