@@ -34,6 +34,7 @@ jobs:
         run: mvn -B clean verify
 
       - name: SonarQube analysis
+        working-directory: ./TennisND
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
