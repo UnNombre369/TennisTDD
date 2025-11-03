@@ -30,6 +30,7 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar
 
       - name: Build with Maven
+        working-directory: ./TennisND
         run: mvn -B clean verify
 
       - name: SonarQube analysis
