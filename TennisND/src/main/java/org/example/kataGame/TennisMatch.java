@@ -15,14 +15,12 @@ public class TennisMatch {
         this.setsPlayer2 = setsPlayer2;
     }
 
-    public int getSetsPlayer1() { return setsPlayer1; }
-    public int getSetsPlayer2() { return setsPlayer2; }
-
     public String getMatchScore() {
-        if (setsPlayer1 == 3 || setsPlayer2 == 3) {
+        if (isMatchOver()) {
             return setsPlayer1 > setsPlayer2 ? "Player 1 wins" : "Player 2 wins";
         }
-        return "Sets: " + setsPlayer1 + "-" + setsPlayer2;
+        String current = (currentSet != null) ? currentSet.getScore() : "0-0";
+        return "Sets: " + setsPlayer1 + "-" + setsPlayer2 + ", Current set: " + current;
     }
 
     public boolean isMatchOver() {

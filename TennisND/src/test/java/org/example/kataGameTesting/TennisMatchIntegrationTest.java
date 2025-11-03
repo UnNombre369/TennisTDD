@@ -43,5 +43,6 @@ public class TennisMatchIntegrationTest {
         }
 
         assertEquals("Player 2 wins", match.getMatchScore());
+        assertTrue(match.isMatchOver());
     }
 }
