@@ -41,6 +41,7 @@ jobs:
         run: |
           echo "GITHUB_WORKSPACE=${GITHUB_WORKSPACE}"
           echo "PWD=$(pwd)"
+          echo "Java version:" && java -version || true
           echo "List top-level:" && ls -la || true
           echo "Find pom.xml under workspace:" 
           find "$GITHUB_WORKSPACE" -maxdepth 4 -type f -name pom.xml -print || true
@@ -64,13 +65,36 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
         run: |
           set -e
-          ARGS=("-Dsonar.projectKey=UnNombre369_TennisTDD" "-Dsonar.login=$SONAR_TOKEN")
-          if [ -n "$SONAR_HOST_URL" ]; then
-            ARGS+=("-Dsonar.host.url=$SONAR_HOST_URL")
+
+          # Validaciones tempranas para evitar errores crípticos
+          if [ -z "$SONAR_TOKEN" ]; then
+            echo "ERROR: SONAR_TOKEN no está configurado. Agrega el secret SONAR_TOKEN en GitHub (Settings → Secrets → Actions)."
+            exit 1
           fi
-          echo "Running mvn sonar with POM $GITHUB_WORKSPACE/TennisND/pom.xml"
+
+          # Si no hay SONAR_HOST_URL pero sí SONAR_ORGANIZATION, asumimos SonarCloud
+          if [ -z "$SONAR_HOST_URL" ]; then
+            if [ -n "$SONAR_ORGANIZATION" ]; then
+              echo "SONAR_HOST_URL no proporcionado, asumiendo SonarCloud: https://sonarcloud.io"
+              SONAR_HOST_URL="https://sonarcloud.io"
+            else
+              echo "ERROR: SONAR_HOST_URL no está configurado. Define el secret SONAR_HOST_URL con la URL de Sonar (p. ej. https://sonarcloud.io o https://tu-sonar:9000), o define SONAR_ORGANIZATION para usar SonarCloud."
+              exit 1
+            fi
+          fi
+
+          # Construimos argumentos comunes (no imprimimos el token)
+          ARGS=("-Dsonar.projectKey=UnNombre369_TennisTDD" "-Dsonar.login=$SONAR_TOKEN" "-Dsonar.host.url=$SONAR_HOST_URL")
+
+          # Si se proporcionó organización (SonarCloud), lo añadimos
+          if [ -n "$SONAR_ORGANIZATION" ]; then
+            ARGS+=("-Dsonar.organization=$SONAR_ORGANIZATION")
+          fi
+
+          echo "Running SonarQube analysis against: $SONAR_HOST_URL"
           mvn -f "$GITHUB_WORKSPACE/TennisND/pom.xml" -B -e org.sonarsource.scanner.maven:sonar-maven-plugin:sonar "${ARGS[@]}"
 
       - name: "Optional: show artifact list"
