@@ -34,22 +34,23 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          key: ${{ runner.os }}-m2-${{ hashFiles('TennisND/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: "Debug: show workspace and check pom"
+      - name: "Debug: show env and locate pom.xml"
         run: |
-          echo "Current directory: $(pwd)"
-          echo "Repository root contents:"
-          ls -la
-          echo "Check TennisND directory:" || true
-          ls -la TennisND || true
-          echo "Check pom.xml exists:" || true
-          if [ -f TennisND/pom.xml ]; then echo "POM found: TennisND/pom.xml"; else echo "POM NOT FOUND: TennisND/pom.xml"; fi
+          echo "GITHUB_WORKSPACE=${GITHUB_WORKSPACE}"
+          echo "PWD=$(pwd)"
+          echo "List top-level:" && ls -la || true
+          echo "Find pom.xml under workspace:" 
+          find "$GITHUB_WORKSPACE" -maxdepth 4 -type f -name pom.xml -print || true
+          echo "Show TennisND listing if present:" || true
+          ls -la "$GITHUB_WORKSPACE"/TennisND || true
 
       - name: Build, run tests and generate JaCoCo report
         run: |
-          mvn -f TennisND/pom.xml -B -V org.jacoco:jacoco-maven-plugin:0.8.10:prepare-agent verify org.jacoco:jacoco-maven-plugin:0.8.10:report
+          echo "Running mvn with POM $GITHUB_WORKSPACE/TennisND/pom.xml"
+          mvn -f "$GITHUB_WORKSPACE/TennisND/pom.xml" -B -V -e org.jacoco:jacoco-maven-plugin:0.8.10:prepare-agent verify org.jacoco:jacoco-maven-plugin:0.8.10:report
 
       - name: Upload test and coverage reports
         uses: actions/upload-artifact@v4
@@ -69,7 +70,8 @@ jobs:
           if [ -n "$SONAR_HOST_URL" ]; then
             ARGS+=("-Dsonar.host.url=$SONAR_HOST_URL")
           fi
-          mvn -f TennisND/pom.xml -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar "${ARGS[@]}"
+          echo "Running mvn sonar with POM $GITHUB_WORKSPACE/TennisND/pom.xml"
+          mvn -f "$GITHUB_WORKSPACE/TennisND/pom.xml" -B -e org.sonarsource.scanner.maven:sonar-maven-plugin:sonar "${ARGS[@]}"
 
       - name: "Optional: show artifact list"
         run: |
