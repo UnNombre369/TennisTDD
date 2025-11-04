@@ -9,21 +9,19 @@ public class TennisSet {
 
     public TennisSet(TennisGame game) {
         this.game = game;
+        checkFinishByGames();
     }
 
     public TennisSet(TennisGame game, int player1Games, int player2Games) {
         this.game = game;
         this.player1Games = player1Games;
         this.player2Games = player2Games;
+        checkFinishByGames();
     }
 
     public String getScore() {
         if (finished) {
-            if (winner==1) {
-                return "Set won by Player 1";
-            } else {
-                return "Set won by Player 2";
-            }
+            return winner == 1 ? "Set won by Player 1" : "Set won by Player 2";
         }
         return player1Games + "-" + player2Games;
     }
@@ -51,7 +49,7 @@ public class TennisSet {
         if (player1Games != 6 || player2Games != 6) return;
         if (tiebreak != null && tiebreak.isFinished()) {
             if (tiebreak.getPlayer1Points() > tiebreak.getPlayer2Points()) {
-                player1Games++;
+                player1Games++; // from 6 to 7
                 winner = 1;
             } else {
                 player2Games++;
@@ -59,5 +57,15 @@ public class TennisSet {
             }
             finished = true;
         }
+    }
+    public boolean needsTiebreak() {
+        return player1Games == 6 && player2Games == 6;
+    }
+
+    public void reset() {
+        player1Games = 0;
+        player2Games = 0;
+        finished = false;
+        winner = 0;
     }
 }
