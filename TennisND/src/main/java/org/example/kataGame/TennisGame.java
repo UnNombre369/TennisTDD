@@ -1,8 +1,6 @@
 package org.example.kataGame;
 
 public class TennisGame {
-    private int player1Score = 0;
-    private int player2Score = 0;
 
     public String transformScoreToText(int playerOneScore, int playerTwoScore) {
         StringBuilder res = new StringBuilder ();
