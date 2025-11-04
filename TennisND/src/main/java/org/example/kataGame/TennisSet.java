@@ -60,14 +60,4 @@ public class TennisSet {
             finished = true;
         }
     }
-    public boolean needsTiebreak() {
-        return player1Games == 6 && player2Games == 6;
-    }
-
-    public void reset() {
-        player1Games = 0;
-        player2Games = 0;
-        finished = false;
-        winner = 0;
-    }
 }

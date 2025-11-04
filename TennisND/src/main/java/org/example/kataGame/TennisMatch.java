@@ -57,8 +57,4 @@ public class TennisMatch {
     public int getSetsPlayer2() {
         return setsPlayer2;
     }
-
-    public TennisSet getCurrentSet() {
-        return currentSet;
-    }
 }
